@@ -23,6 +23,13 @@ import VendorDashboard from "./pages/vendor/VendorDashboard";
 import CreateService from "./pages/vendor/CreateService";
 import VendorAnalytics from "./pages/vendor/VendorAnalytics";
 import VendorProfileSetup from "./pages/vendor/VendorProfileSetup";
+import VendorRegisterPage from "./pages/vendor/VendorRegisterPage";
+import VendorStatusPage from "./pages/vendor/VendorStatusPage";
+import MyServicesPage from "./pages/vendor/MyServicesPage";
+import VendorInboxPage from "./pages/vendor/VendorInboxPage";
+import VendorServicesPage from "./pages/marketplace/VendorServicesPage";
+import ServiceDetailPage from "./pages/marketplace/ServiceDetailPage";
+import ClientInboxPage from "./pages/client/ClientInboxPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,7 +65,20 @@ const App = () => (
               <Route path="new-service" element={<CreateService />} />
               <Route path="analytics" element={<VendorAnalytics />} />
               <Route path="profile" element={<VendorProfileSetup />} />
+              <Route path="services" element={<MyServicesPage />} />
+              <Route path="messages" element={<VendorInboxPage />} />
             </Route>
+
+            {/* Vendor Registration (public) */}
+            <Route path="/vendor/register" element={<VendorRegisterPage />} />
+            <Route path="/vendor/status" element={<VendorStatusPage />} />
+
+            {/* Marketplace (public) */}
+            <Route path="/marketplace/services" element={<VendorServicesPage />} />
+            <Route path="/marketplace/services/:serviceId" element={<ServiceDetailPage />} />
+
+            {/* Client Messages */}
+            <Route path="/client/messages" element={<ClientInboxPage />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

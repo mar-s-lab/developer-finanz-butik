@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Briefcase, PlusCircle, UserCircle, Sparkle, ArrowRight, Clock, CheckCircle, XCircle } from "@phosphor-icons/react";
+import { Briefcase, PlusCircle, UserCircle, Sparkle, ArrowRight, Clock, CheckCircle, XCircle, ChatCircle, Warning, Package, Eye, Users } from "@phosphor-icons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { mockVendorServices, type VendorService, type ServiceStatus } from "@/data/mockVendor";
+import { useVendorActivity } from "@/hooks/useVendorApi";
+
+const DEMO_VENDOR_ID = "00000000-0000-0000-0000-000000000001";
 
 const statusConfig: Record<ServiceStatus, { label: string; className: string; icon: typeof Clock }> = {
   pending_approval: { label: "Pending Approval", className: "bg-amber-100 text-amber-800 border-amber-200", icon: Clock },
@@ -12,9 +15,19 @@ const statusConfig: Record<ServiceStatus, { label: string; className: string; ic
   inactive: { label: "Inactive", className: "bg-muted text-muted-foreground border-border", icon: XCircle },
 };
 
+/* ─── KPI Stats ─── */
+const kpiStats = [
+  { label: "Messages received", icon: ChatCircle, colorClass: "text-[hsl(var(--icon-info))]", bgClass: "bg-[hsl(var(--icon-info)/0.1)]", key: "messages_received" as const, period: "Last 30 days" },
+  { label: "Unread messages", icon: Warning, colorClass: "text-[hsl(var(--icon-warning))]", bgClass: "bg-[hsl(var(--icon-warning)/0.1)]", key: "messages_unread" as const, period: "Active" },
+  { label: "Services published", icon: Package, colorClass: "text-[hsl(var(--icon-success))]", bgClass: "bg-[hsl(var(--icon-success)/0.1)]", key: "services_published" as const, period: "Total" },
+  { label: "Unique clients", icon: Users, colorClass: "text-[hsl(var(--icon-success))]", bgClass: "bg-[hsl(var(--icon-success)/0.1)]", key: "unique_clients" as const, period: "Total" },
+  { label: "Pending review", icon: Eye, colorClass: "text-[hsl(var(--icon-info))]", bgClass: "bg-[hsl(var(--icon-info)/0.1)]", key: "services_pending" as const, period: "Total" },
+] as const;
+
 const VendorDashboard = () => {
   const [services, setServices] = useState<VendorService[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const { data: activity } = useVendorActivity(DEMO_VENDOR_ID);
 
   useEffect(() => {
     setServices([...mockVendorServices]);
@@ -36,6 +49,26 @@ const VendorDashboard = () => {
       <div>
         <h1 className="font-heading text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">Manage your professional services portfolio</p>
+      </div>
+
+      {/* ─── KPI Cards ─── */}
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+        {kpiStats.map(({ label, icon: Icon, colorClass, bgClass, key, period }) => (
+          <Card key={key} className="border-0 shadow-sm">
+            <CardContent className="p-4 space-y-2">
+              <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${bgClass}`}>
+                <Icon size={20} className={colorClass} />
+              </div>
+              <p className="text-2xl font-bold font-heading text-foreground">
+                {activity ? activity[key] : "–"}
+              </p>
+              <div>
+                <p className="text-xs font-medium text-foreground leading-tight">{label}</p>
+                <p className="text-[10px] text-muted-foreground">{period}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <div className={`grid gap-4 ${isEmpty ? 'sm:grid-cols-2' : 'sm:grid-cols-1 max-w-md'}`}>
